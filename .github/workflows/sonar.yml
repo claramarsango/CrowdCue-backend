@@ -17,6 +17,8 @@ jobs:
         run: npm ci
       - name: Coverage
         run: npm run ci:test
+        env:
+          MONGO_URL: ${{ secrets.MONGO_URL }} # Needed to get PR information, if any
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
