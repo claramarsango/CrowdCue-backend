@@ -19,6 +19,9 @@ jobs:
         run: npm run ci:test
         env:
           MONGO_URL: ${{ secrets.MONGO_URL }} # Needed to get PR information, if any
+          PASSWORD_ENCRYPTION_ALGORITHM: ${{ secrets.PASSWORD_ENCRYPTION_ALGORITHM }}
+          PASSWORD_ENCRYPTION_KEY: ${{ secrets.PASSWORD_ENCRYPTION_KEY }}
+          JWT_SECRET: ${{ JWT_SECRET }}
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
