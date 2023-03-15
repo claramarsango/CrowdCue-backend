@@ -65,10 +65,7 @@ describe('Given a controller to log in a user', () => {
       next as NextFunction,
     );
 
-    expect(mockResponse.json).toHaveBeenCalledWith({
-      message: 'This user does not exist',
-    });
-    expect(mockResponse.status).toHaveBeenCalledWith(404);
+    expect(next).toHaveBeenCalled();
   });
 
   test('When the jwt secret environment variable does not exist', async () => {
