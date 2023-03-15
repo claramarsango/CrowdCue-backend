@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express';
+import { CustomHttpError } from '../../errors/custom-http-error.js';
 import { AuthRequest, LoginResponse } from '../../types/auth-types.js';
 import { UserModel } from '../users/user-model.js';
 import { encryptPassword, generateJWTToken } from './auth-utils.js';
@@ -19,7 +20,10 @@ export const loginUserController: RequestHandler<
     const existingUser = await UserModel.findOne(filterUser).exec();
 
     if (existingUser === null) {
-      return res.status(404).json({ message: 'This user does not exist' });
+      throw new CustomHttpError(
+        404,
+        'There is no registered user with this email and password',
+      );
     }
 
     const userToken = generateJWTToken(email);
