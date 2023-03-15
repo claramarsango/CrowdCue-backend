@@ -41,7 +41,7 @@ describe('Given an app with an auth router', () => {
         .send(invalidUser)
         .expect(400);
 
-      expect(response.body.error).toEqual('Bad Request');
+      expect(response.body.msg).toEqual('"email" must be a valid email');
     });
   });
 
@@ -57,9 +57,7 @@ describe('Given an app with an auth router', () => {
         .send(invalidUser)
         .expect(400);
 
-      expect(response.body.details.body[0].message).toEqual(
-        '"password" must be a string',
-      );
+      expect(response.body.msg).toEqual('"password" must be a string');
     });
   });
 
