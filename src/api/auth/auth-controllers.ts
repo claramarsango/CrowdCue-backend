@@ -1,15 +1,19 @@
 import { RequestHandler } from 'express';
 import { CustomHttpError } from '../../errors/custom-http-error.js';
-import { AuthRequest, LoginResponse } from '../../types/auth-types.js';
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+} from '../../types/auth-types.js';
 import { User, UserModel } from '../users/user-model.js';
 import { encryptPassword, generateJWTToken } from './auth-utils.js';
 
 export const registerUserController: RequestHandler<
   unknown,
   unknown,
-  AuthRequest
+  RegisterRequest
 > = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, confirmedPassword } = req.body;
 
   try {
     const existingUser = await UserModel.findOne({ email }).exec();
@@ -18,6 +22,10 @@ export const registerUserController: RequestHandler<
         409,
         'An account with that email already exists',
       );
+    }
+
+    if (password !== confirmedPassword) {
+      throw new CustomHttpError(403, 'Passwords must match');
     }
 
     const newUser: User = {
@@ -38,7 +46,7 @@ export const registerUserController: RequestHandler<
 export const loginUserController: RequestHandler<
   unknown,
   LoginResponse | { message: string },
-  AuthRequest
+  LoginRequest
 > = async (req, res, next) => {
   const { email, password } = req.body;
 
