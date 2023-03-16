@@ -2,7 +2,7 @@ import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import connectDB from '../../database/mongoDB.js';
-import { AuthRequest } from '../../types/auth-types.js';
+import { LoginRequest, RegisterRequest } from '../../types/auth-types.js';
 import app from '../../app.js';
 import { encryptPassword } from './auth-utils.js';
 import { UserModel } from '../users/user-model.js';
@@ -29,36 +29,55 @@ describe('Given an app with an auth router', () => {
     process.env = OLD_ENV;
   });
 
-  describe('When a user wants to register with a valid email and password,', () => {
-    test('then it should be registered', async () => {
-      const newUser: AuthRequest = {
-        email: 'mock@email.com',
-        password: 'mockPassword',
-      };
+  describe('When a user wants to register', () => {
+    describe('with a valid email and password,', () => {
+      test('then it should be registered', async () => {
+        const newUser: RegisterRequest = {
+          email: 'mock@email.com',
+          password: 'mockPassword',
+          confirmedPassword: 'mockPassword',
+        };
 
-      await request(app).post('/auth/register').send(newUser).expect(201);
+        await request(app).post('/auth/register').send(newUser).expect(201);
+      });
+
+      test('but the user already exists, then it should show an error message', async () => {
+        const existingUser: RegisterRequest = {
+          email: 'mock@email.com',
+          password: 'mockPassword',
+          confirmedPassword: 'mockPassword',
+        };
+
+        const response = await request(app)
+          .post('/auth/register')
+          .send(existingUser)
+          .expect(409);
+
+        expect(response.body.msg).toEqual(
+          'An account with that email already exists',
+        );
+      });
     });
 
-    test('but the user already exists, then it should show an error message', async () => {
-      const existingUser: AuthRequest = {
-        email: 'mock@email.com',
+    test('but the passwords do not match, then it should show an error message', async () => {
+      const invalidNewUser: RegisterRequest = {
+        email: 'newMock@email.com',
         password: 'mockPassword',
+        confirmedPassword: 'wrongPassword',
       };
 
       const response = await request(app)
         .post('/auth/register')
-        .send(existingUser)
-        .expect(409);
+        .send(invalidNewUser)
+        .expect(403);
 
-      expect(response.body.msg).toEqual(
-        'An account with that email already exists',
-      );
+      expect(response.body.msg).toEqual('Passwords must match');
     });
   });
 
   describe('When a user wants to login with an invalid email format,', () => {
     test('then it should throw a 400 error and show the type of error', async () => {
-      const invalidUser: AuthRequest = {
+      const invalidUser: LoginRequest = {
         email: 'invalid.email',
         password: 'mockPassword',
       };
@@ -89,7 +108,7 @@ describe('Given an app with an auth router', () => {
   });
 
   describe('When a user wants to login with a valid email and password,', () => {
-    const nonExistentUser = {
+    const nonExistentUser: LoginRequest = {
       email: 'nonexistent@email.com',
       password: 'mockPassword',
     };
@@ -109,7 +128,7 @@ describe('Given an app with an auth router', () => {
     });
 
     test('and the user exists, then it should be logged in', async () => {
-      const userDb = {
+      const userDb: LoginRequest = {
         ...nonExistentUser,
         password: encryptPassword(nonExistentUser.password),
       };
