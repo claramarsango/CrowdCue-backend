@@ -1,8 +1,39 @@
 import { RequestHandler } from 'express';
 import { CustomHttpError } from '../../errors/custom-http-error.js';
 import { AuthRequest, LoginResponse } from '../../types/auth-types.js';
-import { UserModel } from '../users/user-model.js';
+import { User, UserModel } from '../users/user-model.js';
 import { encryptPassword, generateJWTToken } from './auth-utils.js';
+
+export const registerUserController: RequestHandler<
+  unknown,
+  unknown,
+  AuthRequest
+> = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  try {
+    const existingUser = await UserModel.findOne({ email }).exec();
+    if (existingUser !== null) {
+      throw new CustomHttpError(
+        409,
+        'An account with that email already exists',
+      );
+    }
+
+    const newUser: User = {
+      email,
+      password: encryptPassword(password),
+      username: email.split('@')[0],
+      imageURL: '',
+      session: '',
+    };
+
+    await UserModel.create(newUser);
+    return res.status(201).json({ msg: 'User registered successfully!' });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const loginUserController: RequestHandler<
   unknown,
