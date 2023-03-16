@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationError } from 'express-validation';
 import { Error } from 'mongoose';
-import { CustomHttpError } from './custom-http-error';
+import { CustomHttpError } from './custom-http-error.js';
 
 const errorHandler = (
   err: Error,
