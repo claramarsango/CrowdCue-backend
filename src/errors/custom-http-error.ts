@@ -10,7 +10,7 @@ export class CustomHttpError extends Error {
 
   jsonBodyResponse() {
     return {
-      message: this.message,
+      msg: this.message,
       code: this.#code,
     };
   }
