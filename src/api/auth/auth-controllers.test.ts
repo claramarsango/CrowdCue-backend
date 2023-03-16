@@ -24,6 +24,7 @@ describe('Given a controller to register a user,', () => {
     body: {
       email: 'mock@email.com',
       password: 'mockPassword',
+      confirmedPassword: 'mockPassword',
     },
   } as Partial<Request>;
 
@@ -51,6 +52,24 @@ describe('Given a controller to register a user,', () => {
     expect(mockResponse.json).toHaveBeenCalledWith({
       msg: 'User registered successfully!',
     });
+  });
+
+  test('When the passwords do not match, then an error should be thrown and passed on', async () => {
+    const invalidMockRequest = {
+      body: {
+        email: 'mock@email.com',
+        password: 'mockPassword',
+        confirmedPassword: 'wrongPassword',
+      },
+    } as Partial<Request>;
+
+    await registerUserController(
+      invalidMockRequest as Request,
+      mockResponse as Response,
+      next,
+    );
+
+    expect(next).toHaveBeenCalled();
   });
 
   test('When the user is already registered, then an error should be thrown and passed on', async () => {
