@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { UserModel } from '../users/user-model.js';
-import { loginUserController } from './auth-controllers.js';
+import {
+  loginUserController,
+  registerUserController,
+} from './auth-controllers.js';
 import dotenv from 'dotenv';
 import { generateJWTToken } from './auth-utils.js';
 dotenv.config();
@@ -15,6 +18,56 @@ beforeEach(() => {
 afterAll(() => {
   process.env = OLD_ENV;
 });
+
+describe('Given a controller to register a user,', () => {
+  const mockRequest = {
+    body: {
+      email: 'mock@email.com',
+      password: 'mockPassword',
+    },
+  } as Partial<Request>;
+
+  const mockResponse = {
+    json: jest.fn(),
+    status: jest.fn().mockReturnThis(),
+  } as Partial<Response>;
+
+  const next = jest.fn();
+
+  UserModel.findOne = jest
+    .fn()
+    .mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
+
+  test('When the user enters a valid email and password, then it should receive a confirmation', async () => {
+    UserModel.create = jest.fn();
+
+    await registerUserController(
+      mockRequest as Request,
+      mockResponse as Response,
+      next,
+    );
+
+    expect(mockResponse.status).toHaveBeenCalledWith(201);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      msg: 'User registered successfully!',
+    });
+  });
+
+  test('When the user is already registered, then an error should be thrown and passed on', async () => {
+    UserModel.findOne = jest
+      .fn()
+      .mockReturnValue({ exec: jest.fn().mockResolvedValue(1) });
+
+    await registerUserController(
+      mockRequest as Request,
+      mockResponse as Response,
+      next,
+    );
+
+    expect(next).toHaveBeenCalled();
+  });
+});
+
 describe('Given a controller to log in a user', () => {
   const mockRequest = {
     body: {
@@ -34,7 +87,7 @@ describe('Given a controller to log in a user', () => {
 
   const next = jest.fn();
 
-  test('When the password encryption algorithm environment variable does not exist', async () => {
+  test('When the password encryption algorithm environment variable does not exist, then an error should be thrown and passed on', async () => {
     delete process.env.PASSWORD_ENCRYPTION_ALGORITHM;
 
     await loginUserController(
@@ -46,7 +99,7 @@ describe('Given a controller to log in a user', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  test('When the password encryption key environment variable does not exist', async () => {
+  test('When the password encryption key environment variable does not exist, then an error should be thrown and passed on', async () => {
     delete process.env.PASSWORD_ENCRYPTION_KEY;
 
     await loginUserController(
@@ -68,7 +121,7 @@ describe('Given a controller to log in a user', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  test('When the jwt secret environment variable does not exist', async () => {
+  test('When the jwt secret environment variable does not exist, then an error should be thrown and passed on', async () => {
     delete process.env.JWT_SECRET;
 
     UserModel.findOne = jest

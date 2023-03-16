@@ -29,6 +29,33 @@ describe('Given an app with an auth router', () => {
     process.env = OLD_ENV;
   });
 
+  describe('When a user wants to register with a valid email and password,', () => {
+    test('then it should be registered', async () => {
+      const newUser: AuthRequest = {
+        email: 'mock@email.com',
+        password: 'mockPassword',
+      };
+
+      await request(app).post('/auth/register').send(newUser).expect(201);
+    });
+
+    test('but the user already exists, then it should show an error message', async () => {
+      const existingUser: AuthRequest = {
+        email: 'mock@email.com',
+        password: 'mockPassword',
+      };
+
+      const response = await request(app)
+        .post('/auth/register')
+        .send(existingUser)
+        .expect(409);
+
+      expect(response.body.msg).toEqual(
+        'An account with that email already exists',
+      );
+    });
+  });
+
   describe('When a user wants to login with an invalid email format,', () => {
     test('then it should throw a 400 error and show the type of error', async () => {
       const invalidUser: AuthRequest = {
@@ -63,7 +90,7 @@ describe('Given an app with an auth router', () => {
 
   describe('When a user wants to login with a valid email and password,', () => {
     const nonExistentUser = {
-      email: 'mock@email.com',
+      email: 'nonexistent@email.com',
       password: 'mockPassword',
     };
     test('and the password encryption key environment variable does not exist, then it should return a 500 error', async () => {
