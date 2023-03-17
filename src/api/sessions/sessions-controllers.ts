@@ -15,7 +15,8 @@ export const createSessionController: RequestHandler<
   unknown,
   { id: string }
 > = async (req, res, next) => {
-  const user = res.locals.id;
+  const admin = res.locals.id;
+
   const { title } = req.body;
 
   try {
@@ -27,9 +28,8 @@ export const createSessionController: RequestHandler<
       title,
       coverImageURL: '',
       url: '',
-      currentSong: '',
       queuedSongs: [],
-      admin: user,
+      admin,
       participants: [],
     };
 
@@ -45,7 +45,7 @@ export const createSessionController: RequestHandler<
         coverImageURL: data.publicUrl,
       };
     } else {
-      const fileName = `${user}-${Date.now()}.webp`;
+      const fileName = `${admin}-${Date.now()}.webp`;
 
       const { error } = await supabase.storage
         .from(SESSION_COVER_BUCKET_NAME)
