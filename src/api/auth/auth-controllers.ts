@@ -5,7 +5,7 @@ import {
   LoginResponse,
   RegisterRequest,
 } from '../../types/auth-types.js';
-import { User, UserModel } from '../users/user-model.js';
+import { UserModel } from '../users/user-model.js';
 import { encryptPassword, generateJWTToken } from './auth-utils.js';
 
 export const registerUserController: RequestHandler<
@@ -28,7 +28,7 @@ export const registerUserController: RequestHandler<
       throw new CustomHttpError(403, 'Passwords must match');
     }
 
-    const newUser: User = {
+    const newUser = {
       email,
       password: encryptPassword(password),
       username: email.split('@')[0],
@@ -65,7 +65,7 @@ export const loginUserController: RequestHandler<
       );
     }
 
-    const userToken = generateJWTToken(email);
+    const userToken = generateJWTToken(existingUser._id.toString());
 
     res.status(201).json({ accessToken: userToken });
   } catch (error) {
