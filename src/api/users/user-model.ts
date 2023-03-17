@@ -1,11 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
+import { Session } from '../sessions/session-model';
 
 export interface User {
   email: string;
   password: string;
   username: string;
   imageURL: string;
-  session: string;
+  session: Session;
 }
 
 const userSchema = new Schema<User>({
@@ -13,7 +14,7 @@ const userSchema = new Schema<User>({
   password: String,
   username: String,
   imageURL: String,
-  session: String,
+  session: { type: Schema.Types.ObjectId, ref: 'Session' },
 });
 
 export const UserModel = mongoose.model<User>('User', userSchema, 'users');
