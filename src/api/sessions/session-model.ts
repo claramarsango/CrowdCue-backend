@@ -4,9 +4,9 @@ import { User } from '../users/user-model.js';
 
 export interface Session {
   title: string;
-  coverImageURL: string; // Supabase
+  coverImageURL: string;
   url: string;
-  currentSong: Song;
+  currentSong: Song | string;
   queuedSongs: Song[];
   admin: User;
   participants: User[];
@@ -16,21 +16,14 @@ const sessionSchema = new Schema<Session>({
   title: String,
   coverImageURL: String,
   url: String,
-  currentSong: String,
-  queuedSongs: [],
-  admin: String,
-  participants: [],
+  currentSong: { type: Schema.Types.ObjectId, ref: 'Song' },
+  queuedSongs: [{ type: Schema.Types.ObjectId, ref: 'Song' }],
+  admin: { type: Schema.Types.ObjectId, ref: 'User' },
+  participants: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 });
 
-export const sessionModel = mongoose.model<Session>(
+export const SessionModel = mongoose.model<Session>(
   'Session',
   sessionSchema,
   'sessions',
 );
-
-/* - image: Supabase url
-- url: string (/:sessionId)
-- current song: {}
-- queued songs: Object[]
-- admin: user ID
-- participants: User[] */
