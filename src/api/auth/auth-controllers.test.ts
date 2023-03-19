@@ -5,7 +5,8 @@ import {
   registerUserController,
 } from './auth-controllers.js';
 import dotenv from 'dotenv';
-import { generateJWTToken } from './auth-utils.js';
+import { encryptPassword, generateJWTToken } from './auth-utils.js';
+import mongoose from 'mongoose';
 dotenv.config();
 
 const OLD_ENV = process.env;
@@ -106,6 +107,14 @@ describe('Given a controller to log in a user', () => {
 
   const next = jest.fn();
 
+  const mockedExistingUser = {
+    _id: new mongoose.Types.ObjectId('123456789123456789123456'),
+    email: mockRequest.body.email,
+    password: encryptPassword(mockRequest.body.password),
+    imageURL: 'image',
+    inSession: 'sessionId',
+  };
+
   test('When the password encryption algorithm environment variable does not exist, then an error should be thrown and passed on', async () => {
     delete process.env.PASSWORD_ENCRYPTION_ALGORITHM;
 
@@ -134,7 +143,7 @@ describe('Given a controller to log in a user', () => {
     await loginUserController(
       mockRequest as Request,
       mockResponse as Response,
-      next as NextFunction,
+      next,
     );
 
     expect(next).toHaveBeenCalled();
@@ -150,26 +159,26 @@ describe('Given a controller to log in a user', () => {
     await loginUserController(
       mockRequest as Request,
       mockResponse as Response,
-      next as NextFunction,
+      next,
     );
 
     expect(next).toHaveBeenCalled();
   });
 
   test('When the user exists, then it should return the access token', async () => {
-    UserModel.findOne = jest
-      .fn()
-      .mockReturnValue({ exec: jest.fn().mockResolvedValue(1) });
+    UserModel.findOne = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue(mockedExistingUser),
+    });
 
     await loginUserController(
       mockRequest as Request,
       mockResponse as Response,
-      next as NextFunction,
+      next,
     );
 
-    expect(mockResponse.json).toHaveBeenCalledWith({
-      accessToken: generateJWTToken(mockRequest.body.email),
-    });
     expect(mockResponse.status).toHaveBeenCalledWith(201);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      accessToken: generateJWTToken(mockedExistingUser._id.toString()),
+    });
   });
 });
