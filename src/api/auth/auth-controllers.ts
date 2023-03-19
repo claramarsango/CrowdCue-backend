@@ -17,6 +17,7 @@ export const registerUserController: RequestHandler<
 
   try {
     const existingUser = await UserModel.findOne({ email }).exec();
+
     if (existingUser !== null) {
       throw new CustomHttpError(
         409,
@@ -33,10 +34,10 @@ export const registerUserController: RequestHandler<
       password: encryptPassword(password),
       username: email.split('@')[0],
       imageURL: '',
-      session: '',
     };
 
     await UserModel.create(newUser);
+
     return res.status(201).json({ msg: 'User registered successfully!' });
   } catch (error) {
     next(error);
