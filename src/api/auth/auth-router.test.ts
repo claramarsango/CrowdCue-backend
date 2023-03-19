@@ -9,14 +9,13 @@ import { UserModel } from '../users/user-model.js';
 
 describe('Given an app with an auth router', () => {
   let mongoServer: MongoMemoryServer;
+  const OLD_ENV = process.env;
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUrl = mongoServer.getUri();
     await connectDB(mongoUrl);
   });
-
-  const OLD_ENV = process.env;
 
   beforeEach(() => {
     jest.resetModules();
@@ -112,8 +111,24 @@ describe('Given an app with an auth router', () => {
       email: 'nonexistent@email.com',
       password: 'mockPassword',
     };
+
     test('and the password encryption key environment variable does not exist, then it should return a 500 error', async () => {
       delete process.env.PASSWORD_ENCRYPTION_KEY;
+
+      const response = await request(app)
+        .post('/auth/login')
+        .send(nonExistentUser)
+        .expect(500);
+
+      expect(response.status).toEqual(500);
+    });
+
+    test('and the user does not exist, then it should return a 404 error', async () => {
+      await request(app).post('/auth/login').send(nonExistentUser).expect(404);
+    });
+
+    test('and the password encryption algorithm environment variable does not exist, then it should return a 500 error', async () => {
+      delete process.env.PASSWORD_ENCRYPTION_ALGORITHM;
 
       const response = await request(app)
         .post('/auth/login')
@@ -135,6 +150,17 @@ describe('Given an app with an auth router', () => {
       await UserModel.create(userDb);
 
       await request(app).post('/auth/login').send(nonExistentUser).expect(201);
+    });
+
+    test('and the jwt secret environment variable does not exist, then it should return a 500 error', async () => {
+      delete process.env.JWT_SECRET;
+
+      const response = await request(app)
+        .post('/auth/login')
+        .send(nonExistentUser)
+        .expect(500);
+
+      expect(response.status).toEqual(500);
     });
   });
 });
