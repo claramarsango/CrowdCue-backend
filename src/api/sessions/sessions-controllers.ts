@@ -10,7 +10,7 @@ export type SessionRequest = Pick<Session, 'title' | 'coverImageURL'>;
 
 export const createSessionController: RequestHandler<
   unknown,
-  Session,
+  Session | { message: string },
   SessionRequest,
   unknown,
   { id: string }
