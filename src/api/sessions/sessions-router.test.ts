@@ -61,24 +61,56 @@ describe('Given a sessions router,', () => {
 
   const mockToken = generateJWTToken('123456789123456789123456');
 
-  test('when the user has a token, then they should be able to create a session', async () => {
+  describe('when the user wants to create a session,', () => {
+    test('if they have a token, they should be able to', async () => {
+      await request(app)
+        .post('/api/v1/sessions/create')
+        .send(sessionMockRequest.body)
+        .set('Authorization', `Bearer ${mockToken}`)
+        .expect(201);
+    });
+
+    test('if the user does not have a token, then they should not be able to', async () => {
+      await request(app).get('/api/v1/sessions').expect(401);
+    });
+
+    test('if the jwt environment does not exist, the server should respond with a 500 error', async () => {
+      delete process.env.JWT_SECRET;
+
+      await request(app)
+        .post('/api/v1/sessions/create')
+        .set('Authorization', `Bearer ${mockToken}`)
+        .expect(500);
+    });
+  });
+
+  describe('when the user wants to receive a list of sessions,', () => {
+    test('if they have a token, they should be able to get it', async () => {
+      await request(app)
+        .get('/api/v1/sessions/explore')
+        .set('Authorization', `Bearer ${mockToken}`)
+        .expect(200);
+    });
+  });
+
+  /* Test('when the user has a token, then they should be able to create a session', async () => {
     await request(app)
       .post('/api/v1/sessions/create')
       .send(sessionMockRequest.body)
       .set('Authorization', `Bearer ${mockToken}`)
       .expect(201);
-  });
+  }); */
 
-  test('when the user does not have a token, then they should not be able to create a session', async () => {
+  /* test('when the user does not have a token, then they should not be able to create a session', async () => {
     await request(app).get('/api/v1/sessions').expect(401);
-  });
+  }); */
 
-  test('when the jwt environment variable does not exist, the server should respond with a 500 error', async () => {
+  /* test('when the jwt environment variable does not exist, the server should respond with a 500 error', async () => {
     delete process.env.JWT_SECRET;
 
     await request(app)
       .post('/api/v1/sessions/create')
       .set('Authorization', `Bearer ${mockToken}`)
       .expect(500);
-  });
+  }); */
 });
