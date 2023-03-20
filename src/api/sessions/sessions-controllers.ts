@@ -72,3 +72,16 @@ export const createSessionController: RequestHandler<
     next(error);
   }
 };
+
+export const getAllSessionsController: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const foundSessions = await SessionModel.find({}).exec();
+    res.json(foundSessions);
+  } catch (error) {
+    next(error);
+  }
+};
