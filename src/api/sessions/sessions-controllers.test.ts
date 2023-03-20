@@ -36,7 +36,7 @@ describe('Given a controller to create sessions,', () => {
     json: jest.fn(),
     status: jest.fn().mockReturnThis(),
     locals: { id: 'mockId' },
-  } as Partial<Response<Session, { id: string }>>;
+  } as Partial<Response<Session | { message: string }, { id: string }>>;
 
   const next = jest.fn();
 
@@ -63,12 +63,12 @@ describe('Given a controller to create sessions,', () => {
     await createSessionController(
       invalidMockRequest as Request<
         unknown,
-        Session,
+        Session | { message: string },
         SessionRequest,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session, { id: string }>,
+      mockResponse as Response<Session | { message: string }, { id: string }>,
       next,
     );
 
@@ -86,12 +86,12 @@ describe('Given a controller to create sessions,', () => {
     await createSessionController(
       invalidMockRequest as Request<
         unknown,
-        Session,
+        Session | { message: string },
         SessionRequest,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session, { id: string }>,
+      mockResponse as Response<Session | { message: string }, { id: string }>,
       next,
     );
 
@@ -109,12 +109,12 @@ describe('Given a controller to create sessions,', () => {
     await createSessionController(
       mockRequest as Request<
         unknown,
-        Session,
+        Session | { message: string },
         SessionRequest,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session, { id: string }>,
+      mockResponse as Response<Session | { message: string }, { id: string }>,
       next,
     );
 
