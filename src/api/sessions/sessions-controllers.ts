@@ -77,10 +77,29 @@ export const createSessionController: RequestHandler<
 export const getAllSessionsController: RequestHandler<
   unknown,
   SessionPreviewResponse | { msg: string }
-> = async (req, res, next) => {
+> = async (_req, res, next) => {
   try {
     const foundSessions = await SessionModel.find({}).exec();
     res.json(foundSessions);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSessionByIdController: RequestHandler<
+  { _id: string },
+  Session | { message: string }
+> = async (req, res, next) => {
+  const { _id } = req.params;
+
+  try {
+    const session = await SessionModel.findById(_id).populate('admin').exec();
+
+    if (session === null) {
+      throw new CustomHttpError(404, 'This session does not exist');
+    }
+
+    res.json(session);
   } catch (error) {
     next(error);
   }
