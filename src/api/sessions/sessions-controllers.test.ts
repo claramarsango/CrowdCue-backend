@@ -4,6 +4,7 @@ import { Session, SessionModel } from './session-model';
 import {
   createSessionController,
   getAllSessionsController,
+  getSessionByIdController,
   SessionRequest,
 } from './sessions-controllers';
 
@@ -170,5 +171,58 @@ describe('Given a controller to get all sessions,', () => {
     );
 
     expect(next).toHaveBeenCalled();
+  });
+});
+
+describe('Given a controller to get a session by its id,', () => {
+  const mockRequest = {
+    params: { _id: 'mockId' },
+  } as Partial<Request>;
+
+  const mockResponse = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+  } as Partial<Response>;
+
+  const next = jest.fn();
+
+  const mockSession = {
+    _id: 'mockId',
+    title: 'mockSession',
+    coverImageURL: 'mockCover',
+    url: 'mockUrl',
+    queuedSongs: [],
+    admin: 'mockUser',
+    participants: [],
+  };
+
+  test('when the session does not exist, it should pass on an error', async () => {
+    SessionModel.findById = jest.fn().mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
+      exec: jest.fn().mockResolvedValue(null),
+    });
+
+    await getSessionByIdController(
+      mockRequest as Request<{ _id: string }, Session | { message: string }>,
+      mockResponse as Response,
+      next,
+    );
+
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('when the session is found, the server should respond with it', async () => {
+    SessionModel.findById = jest.fn().mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
+      exec: jest.fn().mockResolvedValue(mockSession),
+    });
+
+    await getSessionByIdController(
+      mockRequest as Request<{ _id: string }, Session | { message: string }>,
+      mockResponse as Response,
+      next,
+    );
+
+    expect(mockResponse.json).toHaveBeenCalledWith(mockSession);
   });
 });
