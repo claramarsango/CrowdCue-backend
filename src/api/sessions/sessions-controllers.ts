@@ -39,7 +39,7 @@ export const createSessionController: RequestHandler<
     if (fileBuffer === undefined) {
       const { data } = supabase.storage
         .from(SESSION_COVER_BUCKET_NAME)
-        .getPublicUrl('default-session-img.png');
+        .getPublicUrl('default-session-img.webp');
 
       newSession = {
         ...newSession,
