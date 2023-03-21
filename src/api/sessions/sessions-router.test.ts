@@ -92,25 +92,4 @@ describe('Given a sessions router,', () => {
         .expect(200);
     });
   });
-
-  /* Test('when the user has a token, then they should be able to create a session', async () => {
-    await request(app)
-      .post('/api/v1/sessions/create')
-      .send(sessionMockRequest.body)
-      .set('Authorization', `Bearer ${mockToken}`)
-      .expect(201);
-  }); */
-
-  /* test('when the user does not have a token, then they should not be able to create a session', async () => {
-    await request(app).get('/api/v1/sessions').expect(401);
-  }); */
-
-  /* test('when the jwt environment variable does not exist, the server should respond with a 500 error', async () => {
-    delete process.env.JWT_SECRET;
-
-    await request(app)
-      .post('/api/v1/sessions/create')
-      .set('Authorization', `Bearer ${mockToken}`)
-      .expect(500);
-  }); */
 });
