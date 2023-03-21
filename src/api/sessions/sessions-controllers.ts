@@ -7,6 +7,7 @@ import { CustomHttpError } from '../../errors/custom-http-error.js';
 import { Session, SessionModel } from './session-model.js';
 
 export type SessionRequest = Pick<Session, 'title' | 'coverImageURL'>;
+export type SessionPreviewResponse = Omit<Session, 'currentSong'>[];
 
 export const createSessionController: RequestHandler<
   unknown,
@@ -73,11 +74,10 @@ export const createSessionController: RequestHandler<
   }
 };
 
-export const getAllSessionsController: RequestHandler = async (
-  req,
-  res,
-  next,
-) => {
+export const getAllSessionsController: RequestHandler<
+  unknown,
+  SessionPreviewResponse | { msg: string }
+> = async (req, res, next) => {
   try {
     const foundSessions = await SessionModel.find({}).exec();
     res.json(foundSessions);
