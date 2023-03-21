@@ -3,6 +3,7 @@ import upload from '../file-upload-middleware.js';
 import {
   createSessionController,
   getAllSessionsController,
+  getSessionByIdController,
 } from './sessions-controllers.js';
 
 const sessionsRouter = express.Router();
@@ -12,4 +13,7 @@ sessionsRouter
   .post(upload.single('session-cover'), createSessionController);
 
 sessionsRouter.route('/explore').get(getAllSessionsController);
+
+sessionsRouter.route('/:_id').get(getSessionByIdController);
+
 export default sessionsRouter;
