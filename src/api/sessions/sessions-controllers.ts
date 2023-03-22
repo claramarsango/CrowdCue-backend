@@ -104,3 +104,21 @@ export const getSessionByIdController: RequestHandler<
     next(error);
   }
 };
+
+export const deleteSessionByIdController: RequestHandler<
+  { _id: string },
+  { msg: string }
+> = async (req, res, next) => {
+  const { _id } = req.params;
+  try {
+    const dbRes = await SessionModel.deleteOne({ _id }).exec();
+
+    if (dbRes.deletedCount === 0) {
+      throw new CustomHttpError(404, 'This session does not exist');
+    }
+
+    res.json({ msg: 'The session has been deleted' });
+  } catch (error) {
+    next(error);
+  }
+};
