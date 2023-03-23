@@ -8,4 +8,5 @@ export interface RegisterRequest extends LoginRequest {
 
 export interface LoginResponse {
   accessToken: string;
+  userId: string;
 }
