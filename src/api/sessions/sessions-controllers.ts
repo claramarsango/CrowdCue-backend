@@ -8,10 +8,11 @@ import { Session, SessionModel } from './session-model.js';
 
 export type SessionRequest = Pick<Session, 'title' | 'coverImageURL'>;
 export type SessionPreviewResponse = Omit<Session, 'currentSong'>[];
+export type SessionCreation = Omit<Session, 'currentSong'>;
 
 export const createSessionController: RequestHandler<
   unknown,
-  Session | { message: string },
+  Session | { msg: string },
   SessionRequest,
   unknown,
   { id: string }
@@ -25,7 +26,7 @@ export const createSessionController: RequestHandler<
       throw new CustomHttpError(400, 'Your session must have a title');
     }
 
-    let newSession = {
+    let newSession: SessionCreation = {
       title,
       coverImageURL: '',
       url: '',
@@ -88,12 +89,12 @@ export const getAllSessionsController: RequestHandler<
 
 export const getSessionByIdController: RequestHandler<
   { _id: string },
-  Session | { message: string }
+  Session | { msg: string }
 > = async (req, res, next) => {
   const { _id } = req.params;
 
   try {
-    const session = await SessionModel.findById(_id).populate('admin').exec();
+    const session = await SessionModel.findById(_id).exec();
 
     if (session === null) {
       throw new CustomHttpError(404, 'This session does not exist');
@@ -110,6 +111,7 @@ export const deleteSessionByIdController: RequestHandler<
   { msg: string }
 > = async (req, res, next) => {
   const { _id } = req.params;
+
   try {
     const dbRes = await SessionModel.deleteOne({ _id }).exec();
 
