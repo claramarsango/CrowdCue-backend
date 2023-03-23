@@ -64,7 +64,7 @@ describe('Given a sessions router,', () => {
   describe('when the user wants to create a session,', () => {
     test('if they have a token, they should be able to', async () => {
       await request(app)
-        .post('/api/v1/sessions/create')
+        .post('/api/v1/sessions')
         .send(sessionMockRequest.body)
         .set('Authorization', `Bearer ${mockToken}`)
         .expect(201);
@@ -78,7 +78,7 @@ describe('Given a sessions router,', () => {
       delete process.env.JWT_SECRET;
 
       await request(app)
-        .post('/api/v1/sessions/create')
+        .post('/api/v1/sessions')
         .set('Authorization', `Bearer ${mockToken}`)
         .expect(500);
     });
