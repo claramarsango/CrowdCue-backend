@@ -6,7 +6,7 @@ export interface User {
   password: string;
   username: string;
   imageURL: string;
-  session: Session;
+  inSession: Session;
 }
 
 const userSchema = new Schema<User>({
@@ -14,7 +14,7 @@ const userSchema = new Schema<User>({
   password: String,
   username: String,
   imageURL: String,
-  session: { type: Schema.Types.ObjectId, ref: 'Session' },
+  inSession: { type: Schema.Types.ObjectId, ref: 'Session' },
 });
 
 export const UserModel = mongoose.model<User>('User', userSchema, 'users');
