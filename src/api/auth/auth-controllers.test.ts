@@ -179,6 +179,7 @@ describe('Given a controller to log in a user', () => {
     expect(mockResponse.status).toHaveBeenCalledWith(201);
     expect(mockResponse.json).toHaveBeenCalledWith({
       accessToken: generateJWTToken(mockedExistingUser._id.toString()),
+      userId: '123456789123456789123456',
     });
   });
 });
