@@ -234,37 +234,90 @@ describe('Given a controller to delete a session by its id,', () => {
   const mockResponse = {
     status: jest.fn().mockReturnThis(),
     json: jest.fn(),
+    locals: { id: 'mockUserId' },
   } as Partial<Response>;
 
   const next = jest.fn();
 
-  test('when the session does not exist, an error should be passed on', async () => {
-    SessionModel.deleteOne = jest.fn().mockReturnValue({
-      exec: jest.fn().mockResolvedValue({ deletedCount: 0 }),
-    });
-
-    await deleteSessionByIdController(
-      mockRequest as Request<{ _id: string }, { msg: string }>,
-      mockResponse as Response,
-      next,
-    );
-
-    expect(next).toHaveBeenCalled();
-  });
+  const mockSession = {
+    _id: 'mockId',
+    title: 'mockSession',
+    coverImageURL: 'mockCover',
+    url: 'mockUrl',
+    queuedSongs: [],
+    admin: 'mockUserId',
+    participants: [],
+  };
 
   test('when the session is deleted successfully, a message should be shown', async () => {
+    SessionModel.findById = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue(mockSession),
+    });
+
     SessionModel.deleteOne = jest.fn().mockReturnValue({
       exec: jest.fn().mockResolvedValue({ deletedCount: 1 }),
     });
 
     await deleteSessionByIdController(
-      mockRequest as Request<{ _id: string }, { msg: string }>,
-      mockResponse as Response,
+      mockRequest as Request<
+        { _id: string },
+        { msg: string },
+        unknown,
+        unknown,
+        { id: string }
+      >,
+      mockResponse as Response<{ msg: string }, { id: string }>,
       next,
     );
 
     expect(mockResponse.json).toHaveBeenCalledWith({
       msg: 'The session has been deleted',
     });
+  });
+
+  test('when the session does not exist, an error should be passed on', async () => {
+    SessionModel.findById = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue(null),
+    });
+
+    await deleteSessionByIdController(
+      mockRequest as Request<
+        { _id: string },
+        { msg: string },
+        unknown,
+        unknown,
+        { id: string }
+      >,
+      mockResponse as Response<{ msg: string }, { id: string }>,
+      next,
+    );
+
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('when the user trying to delete the session is not the admin, an error should be passed on', async () => {
+    const invalidMockResponse = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+      locals: { id: 'invalidUserId' },
+    } as Partial<Response>;
+
+    SessionModel.findById = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue(mockSession),
+    });
+
+    await deleteSessionByIdController(
+      mockRequest as Request<
+        { _id: string },
+        { msg: string },
+        unknown,
+        unknown,
+        { id: string }
+      >,
+      invalidMockResponse as Response<{ msg: string }, { id: string }>,
+      next,
+    );
+
+    expect(next).toHaveBeenCalled();
   });
 });
