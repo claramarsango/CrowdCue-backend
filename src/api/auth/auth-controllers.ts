@@ -34,6 +34,7 @@ export const registerUserController: RequestHandler<
       password: encryptPassword(password),
       username: email.split('@')[0],
       imageURL: '',
+      inSession: '',
     };
 
     await UserModel.create(newUser);
