@@ -108,16 +108,26 @@ export const getSessionByIdController: RequestHandler<
 
 export const deleteSessionByIdController: RequestHandler<
   { _id: string },
-  { msg: string }
+  { msg: string },
+  unknown,
+  unknown,
+  { id: string }
 > = async (req, res, next) => {
   const { _id } = req.params;
+  const currentUser = res.locals.id;
 
   try {
-    const dbRes = await SessionModel.deleteOne({ _id }).exec();
+    const session = await SessionModel.findById(_id).exec();
 
-    if (dbRes.deletedCount === 0) {
+    if (session === null) {
       throw new CustomHttpError(404, 'This session does not exist');
     }
+
+    if (session?.admin !== currentUser) {
+      throw new CustomHttpError(401, 'You are not the admin of this session');
+    }
+
+    await SessionModel.deleteOne({ _id }).exec();
 
     res.json({ msg: 'The session has been deleted' });
   } catch (error) {

@@ -10,7 +10,7 @@ import {
 const sessionsRouter = express.Router();
 
 sessionsRouter
-  .route('/create')
+  .route('/')
   .post(upload.single('session-cover'), createSessionController);
 
 sessionsRouter.route('/explore').get(getAllSessionsController);
