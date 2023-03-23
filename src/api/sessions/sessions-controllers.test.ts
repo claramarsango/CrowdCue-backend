@@ -40,7 +40,7 @@ describe('Given a controller to create sessions,', () => {
     json: jest.fn(),
     status: jest.fn().mockReturnThis(),
     locals: { id: 'mockId' },
-  } as Partial<Response<Session | { message: string }, { id: string }>>;
+  } as Partial<Response<Session | { msg: string }, { id: string }>>;
 
   const next = jest.fn();
 
@@ -67,12 +67,12 @@ describe('Given a controller to create sessions,', () => {
     await createSessionController(
       invalidMockRequest as Request<
         unknown,
-        Session | { message: string },
+        Session | { msg: string },
         SessionRequest,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session | { message: string }, { id: string }>,
+      mockResponse as Response<Session | { msg: string }, { id: string }>,
       next,
     );
 
@@ -90,12 +90,12 @@ describe('Given a controller to create sessions,', () => {
     await createSessionController(
       invalidMockRequest as Request<
         unknown,
-        Session | { message: string },
+        Session | { msg: string },
         SessionRequest,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session | { message: string }, { id: string }>,
+      mockResponse as Response<Session | { msg: string }, { id: string }>,
       next,
     );
 
@@ -113,12 +113,12 @@ describe('Given a controller to create sessions,', () => {
     await createSessionController(
       mockRequest as Request<
         unknown,
-        Session | { message: string },
+        Session | { msg: string },
         SessionRequest,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session | { message: string }, { id: string }>,
+      mockResponse as Response<Session | { msg: string }, { id: string }>,
       next,
     );
 
@@ -199,12 +199,11 @@ describe('Given a controller to get a session by its id,', () => {
 
   test('when the session does not exist, it should pass on an error', async () => {
     SessionModel.findById = jest.fn().mockReturnValue({
-      populate: jest.fn().mockReturnThis(),
       exec: jest.fn().mockResolvedValue(null),
     });
 
     await getSessionByIdController(
-      mockRequest as Request<{ _id: string }, Session | { message: string }>,
+      mockRequest as Request<{ _id: string }, Session | { msg: string }>,
       mockResponse as Response,
       next,
     );
@@ -214,12 +213,11 @@ describe('Given a controller to get a session by its id,', () => {
 
   test('when the session is found, the server should respond with it', async () => {
     SessionModel.findById = jest.fn().mockReturnValue({
-      populate: jest.fn().mockReturnThis(),
       exec: jest.fn().mockResolvedValue(mockSession),
     });
 
     await getSessionByIdController(
-      mockRequest as Request<{ _id: string }, Session | { message: string }>,
+      mockRequest as Request<{ _id: string }, Session | { msg: string }>,
       mockResponse as Response,
       next,
     );
