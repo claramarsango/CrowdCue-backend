@@ -4,6 +4,7 @@ import {
   supabase,
 } from '../../database/supabase-client.js';
 import { CustomHttpError } from '../../errors/custom-http-error.js';
+import { UserModel } from '../users/user-model.js';
 import { Session, SessionModel } from './session-model.js';
 
 export type SessionRequest = Pick<Session, 'title' | 'coverImageURL'>;
@@ -130,6 +131,41 @@ export const deleteSessionByIdController: RequestHandler<
     await SessionModel.deleteOne({ _id }).exec();
 
     res.json({ msg: 'The session has been deleted' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createParticipantController: RequestHandler<
+  { _id: string },
+  { msg: string },
+  unknown,
+  unknown,
+  { id: string }
+> = async (req, res, next) => {
+  const { _id } = req.params;
+  const currentUser = res.locals.id;
+
+  try {
+    const foundUser = await UserModel.findById(currentUser).exec();
+
+    if (foundUser?.inSession !== '') {
+      throw new CustomHttpError(
+        400,
+        'You are already participating in a session',
+      );
+    }
+
+    const dbRes = await SessionModel.updateOne(
+      { _id },
+      { $push: { participants: currentUser } },
+    ).exec();
+
+    if (dbRes.matchedCount === 0) {
+      throw new CustomHttpError(404, 'This session does not exist');
+    }
+
+    res.status(204).json({ msg: 'A new user has joined the session' });
   } catch (error) {
     next(error);
   }
