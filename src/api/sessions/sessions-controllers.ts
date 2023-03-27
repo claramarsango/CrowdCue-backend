@@ -185,7 +185,7 @@ export const createParticipantController: RequestHandler<
 
     await UserModel.updateOne({ _id: currentUser }, { inSession: _id }).exec();
 
-    res.status(204).json({ msg: 'A new user has joined the session' });
+    res.json({ msg: 'A new user has joined the session' });
   } catch (error) {
     next(error);
   }
@@ -213,7 +213,7 @@ export const removeParticipantController: RequestHandler<
 
     await UserModel.updateOne({ _id: currentUser }, { inSession: '' }).exec();
 
-    res.status(204).json({ msg: 'You have left the session' });
+    res.json({ msg: 'You have left the session' });
   } catch (error) {
     next(error);
   }
