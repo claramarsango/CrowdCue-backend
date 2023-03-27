@@ -1,11 +1,14 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import { UserModel } from '../users/user-model';
 import { Session, SessionModel } from './session-model';
 import {
+  createParticipantController,
   createSessionController,
   deleteSessionByIdController,
   getAllSessionsController,
   getSessionByIdController,
+  removeParticipantController,
   SessionRequest,
 } from './sessions-controllers';
 
@@ -183,6 +186,7 @@ describe('Given a controller to get a session by its id,', () => {
   const mockResponse = {
     status: jest.fn().mockReturnThis(),
     json: jest.fn(),
+    locals: { id: 'mockUserId' },
   } as Partial<Response>;
 
   const next = jest.fn();
@@ -203,8 +207,14 @@ describe('Given a controller to get a session by its id,', () => {
     });
 
     await getSessionByIdController(
-      mockRequest as Request<{ _id: string }, Session | { msg: string }>,
-      mockResponse as Response,
+      mockRequest as Request<
+        { _id: string },
+        Session | { msg: string },
+        unknown,
+        unknown,
+        { id: string }
+      >,
+      mockResponse as Response<Session | { msg: string }, { id: string }>,
       next,
     );
 
@@ -216,9 +226,19 @@ describe('Given a controller to get a session by its id,', () => {
       exec: jest.fn().mockResolvedValue(mockSession),
     });
 
+    UserModel.updateOne = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ matchedCount: 1, modifiedCount: 1 }),
+    });
+
     await getSessionByIdController(
-      mockRequest as Request<{ _id: string }, Session | { msg: string }>,
-      mockResponse as Response,
+      mockRequest as Request<
+        { _id: string },
+        Session | { msg: string },
+        unknown,
+        unknown,
+        { id: string }
+      >,
+      mockResponse as Response<Session | { msg: string }, { id: string }>,
       next,
     );
 
@@ -246,12 +266,16 @@ describe('Given a controller to delete a session by its id,', () => {
     url: 'mockUrl',
     queuedSongs: [],
     admin: 'mockUserId',
-    participants: [],
+    participants: ['someUser'],
   };
 
   test('when the session is deleted successfully, a message should be shown', async () => {
     SessionModel.findById = jest.fn().mockReturnValue({
       exec: jest.fn().mockResolvedValue(mockSession),
+    });
+
+    UserModel.updateOne = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ matchedCount: 1, modifiedCount: 1 }),
     });
 
     SessionModel.deleteOne = jest.fn().mockReturnValue({
@@ -319,5 +343,169 @@ describe('Given a controller to delete a session by its id,', () => {
     );
 
     expect(next).toHaveBeenCalled();
+  });
+});
+
+describe('Given a controller to create a participant inside a session,', () => {
+  const mockRequest = {
+    params: { _id: 'mockSessionId' },
+  } as Partial<Request>;
+
+  const mockResponse = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+    locals: { id: 'mockUserId' },
+  } as Partial<Response>;
+
+  const next = jest.fn();
+
+  const validMockUser = {
+    email: 'mock@email.com',
+    password: 'password',
+    username: 'mock',
+    imageURL: 'img',
+    inSession: '',
+  };
+
+  const invalidMockUser = {
+    email: 'mock@email.com',
+    password: 'password',
+    username: 'mock',
+    imageURL: 'img',
+    inSession: 'mockSession',
+  };
+
+  test('when the user is already a part of a session, an error should be passed on', async () => {
+    UserModel.findById = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue(invalidMockUser),
+    });
+
+    await createParticipantController(
+      mockRequest as Request<
+        { _id: string },
+        { msg: string },
+        unknown,
+        unknown,
+        { id: string }
+      >,
+      mockResponse as Response<{ msg: string }, { id: string }>,
+      next,
+    );
+
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('when the session does not exist, an error should be passed on', async () => {
+    UserModel.findById = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue(validMockUser),
+    });
+
+    SessionModel.updateOne = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ matchedCount: 0 }),
+    });
+
+    await createParticipantController(
+      mockRequest as Request<
+        { _id: string },
+        { msg: string },
+        unknown,
+        unknown,
+        { id: string }
+      >,
+      mockResponse as Response<{ msg: string }, { id: string }>,
+      next,
+    );
+
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('when the user joins the session successfully, a message should be shown', async () => {
+    UserModel.findById = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue(validMockUser),
+    });
+
+    SessionModel.updateOne = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ modifiedCount: 1 }),
+    });
+
+    UserModel.updateOne = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ modifiedCount: 1 }),
+    });
+
+    await createParticipantController(
+      mockRequest as Request<
+        { _id: string },
+        { msg: string },
+        unknown,
+        unknown,
+        { id: string }
+      >,
+      mockResponse as Response<{ msg: string }, { id: string }>,
+      next,
+    );
+
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      msg: 'A new user has joined the session',
+    });
+  });
+});
+
+describe('Given a controller to remove a participant from a session,', () => {
+  const mockRequest = {
+    params: { id: 'mockSessionId' },
+  } as Partial<Request>;
+
+  const mockResponse = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+    locals: { id: 'mockUserId' },
+  } as Partial<Response>;
+
+  const next = jest.fn();
+
+  test('when the session no longer exists, it should pass on an error', async () => {
+    SessionModel.updateOne = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ matchedCount: 0 }),
+    });
+
+    await removeParticipantController(
+      mockRequest as Request<
+        { _id: string },
+        { msg: string },
+        unknown,
+        unknown,
+        { id: string }
+      >,
+      mockResponse as Response<{ msg: string }, { id: string }>,
+      next,
+    );
+
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('when the participant is removed successfully, it should return a confirmation message', async () => {
+    SessionModel.updateOne = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ modifiedCount: 1 }),
+    });
+
+    UserModel.updateOne = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ modifiedCount: 1 }),
+    });
+
+    await removeParticipantController(
+      mockRequest as Request<
+        { _id: string },
+        { msg: string },
+        unknown,
+        unknown,
+        { id: string }
+      >,
+      mockResponse as Response<{ msg: string }, { id: string }>,
+      next,
+    );
+
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      msg: 'You have left the session',
+    });
   });
 });
