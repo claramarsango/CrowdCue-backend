@@ -32,6 +32,10 @@ jest.mock('@supabase/supabase-js', () => {
               ...data,
             },
           }),
+          remove: jest.fn().mockResolvedValue({
+            error: null,
+            data: {},
+          }),
         }),
       },
     })),
