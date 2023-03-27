@@ -134,6 +134,14 @@ export const deleteSessionByIdController: RequestHandler<
       throw new CustomHttpError(401, 'You are not the admin of this session');
     }
 
+    const file = session.coverImageURL.substring(
+      session.coverImageURL.lastIndexOf('/') + 1,
+    );
+
+    if (session.coverImageURL !== 'default-session-img.webp') {
+      await supabase.storage.from(SESSION_COVER_BUCKET_NAME).remove([file]);
+    }
+
     session.participants.forEach(async user => {
       await UserModel.updateOne({ _id: user }, { inSession: '' }).exec();
     });
