@@ -90,9 +90,13 @@ export const getAllSessionsController: RequestHandler<
 
 export const getSessionByIdController: RequestHandler<
   { _id: string },
-  Session | { msg: string }
+  Session | { msg: string },
+  unknown,
+  unknown,
+  { id: string }
 > = async (req, res, next) => {
   const { _id } = req.params;
+  const admin = res.locals.id;
 
   try {
     const session = await SessionModel.findById(_id).exec();
@@ -100,6 +104,8 @@ export const getSessionByIdController: RequestHandler<
     if (session === null) {
       throw new CustomHttpError(404, 'This session does not exist');
     }
+
+    await UserModel.updateOne({ _id: admin }, { inSession: _id }).exec();
 
     res.json(session);
   } catch (error) {
@@ -127,6 +133,10 @@ export const deleteSessionByIdController: RequestHandler<
     if (session?.admin !== currentUser) {
       throw new CustomHttpError(401, 'You are not the admin of this session');
     }
+
+    session.participants.map(async user => {
+      await UserModel.updateOne({ _id: user }, { inSession: '' }).exec();
+    });
 
     await SessionModel.deleteOne({ _id }).exec();
 
@@ -168,6 +178,34 @@ export const createParticipantController: RequestHandler<
     await UserModel.updateOne({ _id: currentUser }, { inSession: _id }).exec();
 
     res.status(204).json({ msg: 'A new user has joined the session' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const removeParticipantController: RequestHandler<
+  { _id: string },
+  { msg: string },
+  unknown,
+  unknown,
+  { id: string }
+> = async (req, res, next) => {
+  const { _id } = req.params;
+  const currentUser = res.locals.id;
+
+  try {
+    const sessionDbRes = await SessionModel.updateOne(
+      { _id },
+      { $pull: { participants: currentUser } },
+    ).exec();
+
+    if (sessionDbRes.matchedCount === 0) {
+      throw new CustomHttpError(404, 'This session does not exist');
+    }
+
+    await UserModel.updateOne({ _id: currentUser }, { inSession: '' }).exec();
+
+    res.status(204).json({ msg: 'You have left the session' });
   } catch (error) {
     next(error);
   }
