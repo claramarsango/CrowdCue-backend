@@ -134,7 +134,7 @@ export const deleteSessionByIdController: RequestHandler<
       throw new CustomHttpError(401, 'You are not the admin of this session');
     }
 
-    session.participants.map(async user => {
+    session.participants.forEach(async user => {
       await UserModel.updateOne({ _id: user }, { inSession: '' }).exec();
     });
 
