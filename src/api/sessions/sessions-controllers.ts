@@ -156,14 +156,16 @@ export const createParticipantController: RequestHandler<
       );
     }
 
-    const dbRes = await SessionModel.updateOne(
+    const sessionDbRes = await SessionModel.updateOne(
       { _id },
       { $push: { participants: currentUser } },
     ).exec();
 
-    if (dbRes.matchedCount === 0) {
+    if (sessionDbRes.matchedCount === 0) {
       throw new CustomHttpError(404, 'This session does not exist');
     }
+
+    await UserModel.updateOne({ _id: currentUser }, { inSession: _id }).exec();
 
     res.status(204).json({ msg: 'A new user has joined the session' });
   } catch (error) {

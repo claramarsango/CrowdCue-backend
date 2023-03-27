@@ -406,6 +406,10 @@ describe('Given a controller to create a participant inside a session,', () => {
       exec: jest.fn().mockResolvedValue({ modifiedCount: 1 }),
     });
 
+    UserModel.updateOne = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ modifiedCount: 1 }),
+    });
+
     await createParticipantController(
       mockRequest as Request<
         { _id: string },
