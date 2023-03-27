@@ -6,6 +6,7 @@ import {
   deleteSessionByIdController,
   getAllSessionsController,
   getSessionByIdController,
+  removeParticipantController,
 } from './sessions-controllers.js';
 
 const sessionsRouter = express.Router();
@@ -20,6 +21,7 @@ sessionsRouter
   .route('/:_id')
   .get(getSessionByIdController)
   .post(createParticipantController)
+  .patch(removeParticipantController)
   .delete(deleteSessionByIdController);
 
 export default sessionsRouter;
