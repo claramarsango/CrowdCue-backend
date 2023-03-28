@@ -149,7 +149,7 @@ export const deleteSessionByIdController: RequestHandler<
       session.coverImageURL.lastIndexOf('/') + 1,
     );
 
-    if (session.coverImageURL !== 'default-session-img.webp') {
+    if (!session.coverImageURL.includes('default-session-img')) {
       await supabase.storage.from(SESSION_COVER_BUCKET_NAME).remove([file]);
     }
 
