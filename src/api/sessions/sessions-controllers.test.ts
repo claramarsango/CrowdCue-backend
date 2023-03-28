@@ -457,12 +457,15 @@ describe('Given a controller to create a participant inside a session,', () => {
     await createParticipantController(
       mockRequest as Request<
         { _id: string },
-        { msg: string },
+        { msg: string; sessionId: string },
         unknown,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<{ msg: string }, { id: string }>,
+      mockResponse as Response<
+        { msg: string; sessionId: string },
+        { id: string }
+      >,
       next,
     );
 
@@ -481,12 +484,15 @@ describe('Given a controller to create a participant inside a session,', () => {
     await createParticipantController(
       mockRequest as Request<
         { _id: string },
-        { msg: string },
+        { msg: string; sessionId: string },
         unknown,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<{ msg: string }, { id: string }>,
+      mockResponse as Response<
+        { msg: string; sessionId: string },
+        { id: string }
+      >,
       next,
     );
 
@@ -509,17 +515,21 @@ describe('Given a controller to create a participant inside a session,', () => {
     await createParticipantController(
       mockRequest as Request<
         { _id: string },
-        { msg: string },
+        { msg: string; sessionId: string },
         unknown,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<{ msg: string }, { id: string }>,
+      mockResponse as Response<
+        { msg: string; sessionId: string },
+        { id: string }
+      >,
       next,
     );
 
     expect(mockResponse.json).toHaveBeenCalledWith({
       msg: 'A new user has joined the session',
+      sessionId: 'mockSessionId',
     });
   });
 });
