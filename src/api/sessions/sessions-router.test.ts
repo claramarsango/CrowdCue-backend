@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import app from '../../app';
 import connectDB from '../../database/mongoDB';
 import { generateJWTToken } from '../auth/auth-utils';
+import { UserModel } from '../users/user-model';
 
 jest.mock('@supabase/supabase-js', () => {
   const data = {
@@ -56,13 +57,26 @@ describe('Given a sessions router,', () => {
     body: {
       title: 'sessionTitle',
     },
-    file: { buffer: undefined },
+    file: undefined,
   };
 
-  const mockToken = generateJWTToken('123456789123456789123456');
+  const validMockUser = {
+    _id: new mongoose.Types.ObjectId('123456789123456789123456'),
+    email: 'mock@email.com',
+    password: 'password',
+    username: 'mock',
+    imageURL: 'img',
+    inSession: '',
+  };
+
+  const mockToken = generateJWTToken(validMockUser._id.toString());
 
   describe('when the user wants to create a session,', () => {
     test('if they have a token, they should be able to', async () => {
+      UserModel.findById = jest
+        .fn()
+        .mockReturnValue({ exec: jest.fn().mockResolvedValue(validMockUser) });
+
       await request(app)
         .post('/api/v1/sessions')
         .send(sessionMockRequest.body)
