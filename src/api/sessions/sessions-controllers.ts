@@ -180,7 +180,10 @@ export const createParticipantController: RequestHandler<
   try {
     const foundUser = await UserModel.findById(currentUser).exec();
 
-    if (foundUser?.inSession !== '' || foundUser?.inSession !== _id) {
+    if (
+      foundUser?.inSession !== '' ||
+      (foundUser?.inSession !== _id && foundUser?.inSession !== '')
+    ) {
       throw new CustomHttpError(
         400,
         'You are already participating in a session',
