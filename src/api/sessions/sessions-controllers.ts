@@ -13,7 +13,7 @@ export type SessionCreation = Omit<Session, 'currentSong'>;
 
 export const createSessionController: RequestHandler<
   unknown,
-  Session | { msg: string },
+  { session: Session } | { msg: string },
   SessionRequest,
   unknown,
   { id: string }
@@ -70,7 +70,7 @@ export const createSessionController: RequestHandler<
 
     const session = await SessionModel.create(newSession);
 
-    return res.status(201).json(session);
+    return res.status(201).json({ session });
   } catch (error) {
     next(error);
   }
@@ -78,11 +78,11 @@ export const createSessionController: RequestHandler<
 
 export const getAllSessionsController: RequestHandler<
   unknown,
-  SessionPreviewResponse | { msg: string }
+  { sessions: SessionPreviewResponse } | { msg: string }
 > = async (_req, res, next) => {
   try {
     const foundSessions = await SessionModel.find({}).exec();
-    res.json(foundSessions);
+    res.json({ sessions: foundSessions });
   } catch (error) {
     next(error);
   }
@@ -90,7 +90,7 @@ export const getAllSessionsController: RequestHandler<
 
 export const getSessionByIdController: RequestHandler<
   { _id: string },
-  Session | { msg: string },
+  { session: Session } | { msg: string },
   unknown,
   unknown,
   { id: string }
@@ -107,7 +107,7 @@ export const getSessionByIdController: RequestHandler<
 
     await UserModel.updateOne({ _id: admin }, { inSession: _id }).exec();
 
-    res.json(session);
+    res.json({ session });
   } catch (error) {
     next(error);
   }
