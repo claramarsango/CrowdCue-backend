@@ -43,6 +43,13 @@ jest.mock('@supabase/supabase-js', () => {
 });
 
 describe('Given a controller to create sessions,', () => {
+  const mockRequest = {
+    body: {
+      title: 'sessionTitle',
+    },
+    file: { buffer: Buffer.from('mockBuffer') },
+  } as Partial<Request>;
+
   const mockResponse = {
     json: jest.fn(),
     status: jest.fn().mockReturnThis(),
@@ -61,7 +68,27 @@ describe('Given a controller to create sessions,', () => {
     _id: 'mockSessionId',
   };
 
+  const validMockUser = {
+    email: 'mock@email.com',
+    password: 'password',
+    username: 'mock',
+    imageURL: 'img',
+    inSession: '',
+  };
+
+  const invalidMockUser = {
+    email: 'mock@email.com',
+    password: 'password',
+    username: 'mock',
+    imageURL: 'img',
+    inSession: 'mockSession',
+  };
+
   SessionModel.create = jest.fn().mockResolvedValue(session);
+
+  UserModel.updateOne = jest.fn().mockReturnValue({
+    exec: jest.fn().mockResolvedValue({ matchedCount: 1, modifiedCount: 1 }),
+  });
 
   test('when the user tries to create a session without a title, it should pass on an error', async () => {
     const invalidMockRequest = {
@@ -71,8 +98,35 @@ describe('Given a controller to create sessions,', () => {
       file: { buffer: Buffer.from('mockBuffer') },
     } as Partial<Request>;
 
+    UserModel.findById = jest
+      .fn()
+      .mockReturnValue({ exec: jest.fn().mockResolvedValue(validMockUser) });
+
     await createSessionController(
       invalidMockRequest as Request<
+        unknown,
+        { session: Session } | { msg: string },
+        SessionRequest,
+        unknown,
+        { id: string }
+      >,
+      mockResponse as Response<
+        { session: Session } | { msg: string },
+        { id: string }
+      >,
+      next,
+    );
+
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('when the user tries to create a session but they are already the admin of one, it should pass on an error', async () => {
+    UserModel.findById = jest
+      .fn()
+      .mockReturnValue({ exec: jest.fn().mockResolvedValue(invalidMockUser) });
+
+    await createSessionController(
+      mockRequest as Request<
         unknown,
         { session: Session } | { msg: string },
         SessionRequest,
@@ -97,6 +151,10 @@ describe('Given a controller to create sessions,', () => {
       file: undefined,
     } as Partial<Request>;
 
+    UserModel.findById = jest
+      .fn()
+      .mockReturnValue({ exec: jest.fn().mockResolvedValue(validMockUser) });
+
     await createSessionController(
       invalidMockRequest as Request<
         unknown,
@@ -116,12 +174,9 @@ describe('Given a controller to create sessions,', () => {
   });
 
   test('when the user uploads an image and provides a title, it should create a session', async () => {
-    const mockRequest = {
-      body: {
-        title: 'sessionTitle',
-      },
-      file: { buffer: Buffer.from('mockBuffer') },
-    } as Partial<Request>;
+    UserModel.findById = jest
+      .fn()
+      .mockReturnValue({ exec: jest.fn().mockResolvedValue(validMockUser) });
 
     await createSessionController(
       mockRequest as Request<

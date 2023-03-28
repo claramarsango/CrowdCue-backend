@@ -23,6 +23,12 @@ export const createSessionController: RequestHandler<
   const { title } = req.body;
 
   try {
+    const foundUser = await UserModel.findById(admin).exec();
+
+    if (foundUser?.inSession !== '') {
+      throw new CustomHttpError(400, 'You are already the admin of a session');
+    }
+
     if (!title) {
       throw new CustomHttpError(400, 'Your session must have a title');
     }
@@ -69,6 +75,11 @@ export const createSessionController: RequestHandler<
     }
 
     const session = await SessionModel.create(newSession);
+
+    await UserModel.updateOne(
+      { _id: admin },
+      { inSession: session._id },
+    ).exec();
 
     return res.status(201).json({ session });
   } catch (error) {
@@ -147,6 +158,8 @@ export const deleteSessionByIdController: RequestHandler<
     });
 
     await SessionModel.deleteOne({ _id }).exec();
+
+    await UserModel.updateOne({ _id: currentUser }, { inSession: '' });
 
     res.json({ msg: 'The session has been deleted' });
   } catch (error) {
