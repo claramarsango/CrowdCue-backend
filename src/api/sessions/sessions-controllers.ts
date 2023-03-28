@@ -169,7 +169,7 @@ export const deleteSessionByIdController: RequestHandler<
 
 export const createParticipantController: RequestHandler<
   { _id: string },
-  { msg: string },
+  { msg: string; sessionId: string },
   unknown,
   unknown,
   { id: string }
@@ -180,7 +180,10 @@ export const createParticipantController: RequestHandler<
   try {
     const foundUser = await UserModel.findById(currentUser).exec();
 
-    if (foundUser?.inSession !== '') {
+    if (
+      foundUser?.inSession !== '' ||
+      (foundUser?.inSession !== _id && foundUser?.inSession !== '')
+    ) {
       throw new CustomHttpError(
         400,
         'You are already participating in a session',
@@ -198,7 +201,7 @@ export const createParticipantController: RequestHandler<
 
     await UserModel.updateOne({ _id: currentUser }, { inSession: _id }).exec();
 
-    res.json({ msg: 'A new user has joined the session' });
+    res.json({ msg: 'A new user has joined the session', sessionId: _id });
   } catch (error) {
     next(error);
   }
