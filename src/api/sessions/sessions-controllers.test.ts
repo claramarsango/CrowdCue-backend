@@ -47,7 +47,7 @@ describe('Given a controller to create sessions,', () => {
     json: jest.fn(),
     status: jest.fn().mockReturnThis(),
     locals: { id: 'mockId' },
-  } as Partial<Response<Session | { msg: string }, { id: string }>>;
+  } as Partial<Response>;
 
   const next = jest.fn();
 
@@ -69,17 +69,20 @@ describe('Given a controller to create sessions,', () => {
         title: '',
       },
       file: { buffer: Buffer.from('mockBuffer') },
-    } as unknown as Partial<Request>;
+    } as Partial<Request>;
 
     await createSessionController(
       invalidMockRequest as Request<
         unknown,
-        Session | { msg: string },
+        { session: Session } | { msg: string },
         SessionRequest,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session | { msg: string }, { id: string }>,
+      mockResponse as Response<
+        { session: Session } | { msg: string },
+        { id: string }
+      >,
       next,
     );
 
@@ -91,18 +94,21 @@ describe('Given a controller to create sessions,', () => {
       body: {
         title: 'mockTitle',
       },
-      file: { buffer: undefined },
-    } as unknown as Partial<Request>;
+      file: undefined,
+    } as Partial<Request>;
 
     await createSessionController(
       invalidMockRequest as Request<
         unknown,
-        Session | { msg: string },
+        { session: Session } | { msg: string },
         SessionRequest,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session | { msg: string }, { id: string }>,
+      mockResponse as Response<
+        { session: Session } | { msg: string },
+        { id: string }
+      >,
       next,
     );
 
@@ -120,12 +126,15 @@ describe('Given a controller to create sessions,', () => {
     await createSessionController(
       mockRequest as Request<
         unknown,
-        Session | { msg: string },
+        { session: Session } | { msg: string },
         SessionRequest,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session | { msg: string }, { id: string }>,
+      mockResponse as Response<
+        { session: Session } | { msg: string },
+        { id: string }
+      >,
       next,
     );
 
@@ -164,7 +173,7 @@ describe('Given a controller to get all sessions,', () => {
       next,
     );
 
-    expect(mockResponse.json).toHaveBeenCalledWith(sessions);
+    expect(mockResponse.json).toHaveBeenCalledWith({ sessions });
   });
 
   test('when an error is thrown, it should be passed on to be handled', async () => {
@@ -213,12 +222,15 @@ describe('Given a controller to get a session by its id,', () => {
     await getSessionByIdController(
       mockRequest as Request<
         { _id: string },
-        Session | { msg: string },
+        { session: Session } | { msg: string },
         unknown,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session | { msg: string }, { id: string }>,
+      mockResponse as Response<
+        { session: Session } | { msg: string },
+        { id: string }
+      >,
       next,
     );
 
@@ -237,16 +249,19 @@ describe('Given a controller to get a session by its id,', () => {
     await getSessionByIdController(
       mockRequest as Request<
         { _id: string },
-        Session | { msg: string },
+        { session: Session } | { msg: string },
         unknown,
         unknown,
         { id: string }
       >,
-      mockResponse as Response<Session | { msg: string }, { id: string }>,
+      mockResponse as Response<
+        { session: Session } | { msg: string },
+        { id: string }
+      >,
       next,
     );
 
-    expect(mockResponse.json).toHaveBeenCalledWith(mockSession);
+    expect(mockResponse.json).toHaveBeenCalledWith({ session: mockSession });
   });
 });
 
