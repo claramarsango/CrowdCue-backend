@@ -4,6 +4,7 @@ import {
   supabase,
 } from '../../database/supabase-client.js';
 import { CustomHttpError } from '../../errors/custom-http-error.js';
+import { SongModel } from '../songs/song-model.js';
 import { UserModel } from '../users/user-model.js';
 import { Session, SessionModel } from './session-model.js';
 
@@ -33,11 +34,13 @@ export const createSessionController: RequestHandler<
       throw new CustomHttpError(400, 'Your session must have a title');
     }
 
+    const foundSongs = await SongModel.find({}).exec();
+
     let newSession: SessionCreation = {
       title,
       coverImageURL: '',
       url: '',
-      queuedSongs: [],
+      queuedSongs: foundSongs,
       admin,
       participants: [],
     };
@@ -110,7 +113,9 @@ export const getSessionByIdController: RequestHandler<
   const admin = res.locals.id;
 
   try {
-    const session = await SessionModel.findById(_id).exec();
+    const session = await SessionModel.findById(_id)
+      .populate('queuedSongs')
+      .exec();
 
     if (session === null) {
       throw new CustomHttpError(404, 'This session does not exist');
