@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import { SongModel } from '../songs/song-model';
 import { UserModel } from '../users/user-model';
 import { Session, SessionModel } from './session-model';
 import {
@@ -155,6 +156,10 @@ describe('Given a controller to create sessions,', () => {
       .fn()
       .mockReturnValue({ exec: jest.fn().mockResolvedValue(validMockUser) });
 
+    SongModel.find = jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue([]),
+    });
+
     await createSessionController(
       invalidMockRequest as Request<
         unknown,
@@ -259,18 +264,25 @@ describe('Given a controller to get a session by its id,', () => {
 
   const next = jest.fn();
 
+  const mockSong = {
+    title: '',
+    artist: '',
+    songURL: 'song',
+  };
+
   const mockSession = {
     _id: 'mockId',
     title: 'mockSession',
     coverImageURL: 'mockCover',
     url: 'mockUrl',
-    queuedSongs: [],
+    queuedSongs: [mockSong],
     admin: 'mockUser',
     participants: [],
   };
 
   test('when the session does not exist, it should pass on an error', async () => {
     SessionModel.findById = jest.fn().mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
       exec: jest.fn().mockResolvedValue(null),
     });
 
@@ -294,6 +306,7 @@ describe('Given a controller to get a session by its id,', () => {
 
   test('when the session is found, the server should respond with it', async () => {
     SessionModel.findById = jest.fn().mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
       exec: jest.fn().mockResolvedValue(mockSession),
     });
 
