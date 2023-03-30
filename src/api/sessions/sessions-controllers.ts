@@ -164,7 +164,7 @@ export const deleteSessionByIdController: RequestHandler<
 
     await SessionModel.deleteOne({ _id }).exec();
 
-    await UserModel.updateOne({ _id: currentUser }, { inSession: '' });
+    await UserModel.updateOne({ _id: currentUser }, { inSession: '' }).exec();
 
     res.json({ msg: 'The session has been deleted' });
   } catch (error) {
