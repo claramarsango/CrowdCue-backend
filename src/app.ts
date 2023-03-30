@@ -12,6 +12,7 @@ app.use(cors());
 app.disable('x-powered-by');
 
 app.get('/', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=31536000');
   res.json('server is up!');
 });
 
