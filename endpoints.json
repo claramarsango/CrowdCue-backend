@@ -1,0 +1,334 @@
+{
+  "info": {
+    "_postman_id": "2060349c-44d3-46a3-8709-df97909e1ffa",
+    "name": "CrowdCue",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "25347560"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"yourname@email.com\",\n    \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://clara-marsango-final-front-202301-mal.netlify.app/auth/register",
+              "protocol": "https",
+              "host": [
+                "clara-marsango-final-front-202301-mal",
+                "netlify",
+                "app"
+              ],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"yourname@email.com\",\n    \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://clara-marsango-final-front-202301-mal.netlify.app/auth/login",
+              "protocol": "https",
+              "host": [
+                "clara-marsango-final-front-202301-mal",
+                "netlify",
+                "app"
+              ],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sessions",
+      "item": [
+        {
+          "name": "Create Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MjU2YjE3YjZkODBlYzJlMzlhYzkwYiIsImlhdCI6MTY4MDE3MzkwM30.KvodL5B3pOSp8vPIXDXBikV6Hr0RK9fS_D4Oxyfk_cA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "session title",
+                  "type": "text"
+                },
+                {
+                  "key": "session-cover",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://clara-marsango-final-front-202301-mal.netlify.app/api/v1/sessions",
+              "protocol": "https",
+              "host": [
+                "clara-marsango-final-front-202301-mal",
+                "netlify",
+                "app"
+              ],
+              "path": ["api", "v1", "sessions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sessions",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MjU2YjE3YjZkODBlYzJlMzlhYzkwYiIsImlhdCI6MTY4MDE3MzkwM30.KvodL5B3pOSp8vPIXDXBikV6Hr0RK9fS_D4Oxyfk_cA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://clara-marsango-final-front-202301-mal.netlify.app/api/v1/sessions/explore",
+              "protocol": "https",
+              "host": [
+                "clara-marsango-final-front-202301-mal",
+                "netlify",
+                "app"
+              ],
+              "path": ["api", "v1", "sessions", "explore"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get One Session",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MjU2YjE3YjZkODBlYzJlMzlhYzkwYiIsImlhdCI6MTY4MDE3MzkwM30.KvodL5B3pOSp8vPIXDXBikV6Hr0RK9fS_D4Oxyfk_cA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"params\": \"sessionId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://clara-marsango-final-front-202301-mal.netlify.app/api/v1/sessions/6424ef2c924c4643836c6939",
+              "protocol": "https",
+              "host": [
+                "clara-marsango-final-front-202301-mal",
+                "netlify",
+                "app"
+              ],
+              "path": ["api", "v1", "sessions", "6424ef2c924c4643836c6939"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Participant In Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MjU2YjE3YjZkODBlYzJlMzlhYzkwYiIsImlhdCI6MTY4MDE3MzkwM30.KvodL5B3pOSp8vPIXDXBikV6Hr0RK9fS_D4Oxyfk_cA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"params\": \"sessionId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://clara-marsango-final-front-202301-mal.netlify.app/api/v1/sessions/6424ef2c924c4643836c6939",
+              "protocol": "https",
+              "host": [
+                "clara-marsango-final-front-202301-mal",
+                "netlify",
+                "app"
+              ],
+              "path": ["api", "v1", "sessions", "6424ef2c924c4643836c6939"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Session Participant",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MjU2YjE3YjZkODBlYzJlMzlhYzkwYiIsImlhdCI6MTY4MDE3MzkwM30.KvodL5B3pOSp8vPIXDXBikV6Hr0RK9fS_D4Oxyfk_cA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"params\": \"sessionId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://clara-marsango-final-front-202301-mal.netlify.app/api/v1/sessions/6424ef2c924c4643836c6939",
+              "protocol": "https",
+              "host": [
+                "clara-marsango-final-front-202301-mal",
+                "netlify",
+                "app"
+              ],
+              "path": ["api", "v1", "sessions", "6424ef2c924c4643836c6939"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MjU2YjE3YjZkODBlYzJlMzlhYzkwYiIsImlhdCI6MTY4MDE3MzkwM30.KvodL5B3pOSp8vPIXDXBikV6Hr0RK9fS_D4Oxyfk_cA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"params\": \"sessionId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://clara-marsango-final-front-202301-mal.netlify.app/api/v1/sessions/6424ef2c924c4643836c6939",
+              "protocol": "https",
+              "host": [
+                "clara-marsango-final-front-202301-mal",
+                "netlify",
+                "app"
+              ],
+              "path": ["api", "v1", "sessions", "6424ef2c924c4643836c6939"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MjU2YjE3YjZkODBlYzJlMzlhYzkwYiIsImlhdCI6MTY4MDE3MzkwM30.KvodL5B3pOSp8vPIXDXBikV6Hr0RK9fS_D4Oxyfk_cA",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [""]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [""]
+          }
+        }
+      ]
+    }
+  ]
+}
